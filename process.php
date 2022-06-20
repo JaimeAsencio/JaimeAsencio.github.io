@@ -152,7 +152,7 @@ $json = json_decode($responseData, true);
 
 ?>
 <!DOCTYPE html>
-"lang" and/or "xml:lang" attributes to this "<html>" element
+"<html>" 
 <head>
 	<title></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
