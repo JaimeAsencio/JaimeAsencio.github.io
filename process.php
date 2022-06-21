@@ -1,9 +1,9 @@
-﻿<?php 
+<?php 
 session_start();
 header('Content-Type: text/html; charset=utf-8');
 include "conection.php";
 include "utilitarios.php";
-
+//hola
 $nombre_fichero = '../files/midtid.txt';
 $existe =  true;
 $vacio = true;
@@ -17,7 +17,7 @@ if (!file_exists($nombre_fichero)) {
 if (filesize($nombre_fichero) == 0){
   $vacio = false;
 }else{
-  $file = fopen($nombre_fichero, "r") "or" ("Error abriendo fichero!");
+  $file = fopen($nombre_fichero, "r") || ("Error abriendo fichero!");
   $linea = fgets($file);
   $terminal =  explode("_", $linea);
   $mid = trim($terminal[0]);
@@ -26,19 +26,11 @@ if (filesize($nombre_fichero) == 0){
   fclose($file);     
 }
 
-
+//88
 
 $merchantId=$mid;//Homologación 7100040113
 $terminalId=$tid;//BP para OTT
 
-/*
-$merchantId="5000004001";//SUPERMAXI
-$terminalId="L0100402";
-
-*/
-
-/*$merchantId="1000000505";
-$terminalId="PD100406";*/
 
 
 
@@ -49,19 +41,13 @@ $_SESSION['merchterm'] = $merchterm;
 
 
 /*
-**Low Risk - DATAFAST*/
+*Low Risk - DATAFAST/
 /*if($modalidad=='1'){
 	$_SESSION['entityId'] = "8a8294185a65bf5e015a6c8b89a10d8d";
 	$_SESSION['autorizador'] =  "OGE4Mjk0MTg1YTY1YmY1ZTAxNWE2YzhiMmY2OTBkOGJ8UmtqcHlOTkU4cw==";
 }else{*/
 	$_SESSION['entityId'] = "8a8294175f113aad015f11652f2200a5";
 	$_SESSION['autorizador'] =  "OGE4Mjk0MTg1YTY1YmY1ZTAxNWE2YzhjNzI4YzBkOTV8YmZxR3F3UTMyWA==";
-//}
-
-//$_SESSION['entityId']=$entity;
-//$_SESSION['autorizador']=$token;
-/*$_SESSION['userId']="8a8294185a65bf5e015a6c8b2f690d8b";
-$_SESSION['password']="RkjpyNNE8s";*/
 
 
 
@@ -71,8 +57,11 @@ $_SESSION['password']="RkjpyNNE8s";*/
 
 
 
-function request($items, $total,$iva,$totaTarifa12,$totalBase0,$email, $primer_nombre, $segundo_nombre, $apellido, $cedula, $trx,$ip_address, $finger,$merchterm,
-	$telefono, $direccion_cliente, $pais_cliente, $direccion_entrega, $pais_entrega) {
+
+
+
+function request($items,$iva,$totaTarifa12,$totalBase0,  $apellido, $finger,$merchterm
+	 ) {
 	$finger = urlencode($finger);
 	$i = 0;
 	$url = "https://test.oppwa.com/v1/checkouts";
@@ -83,24 +72,22 @@ function request($items, $total,$iva,$totaTarifa12,$totalBase0,$email, $primer_n
 	$valueTotalIva 	= str_pad($totaTarifa12, 12, '0', STR_PAD_LEFT);
 	$valueTotalBase0= str_pad($totalBase0, 12, '0', STR_PAD_LEFT);	
 	$data = "entityId=".$_SESSION['entityId'].
-		"&amount=".$total.
+		
 		"&currency=USD".
 		"&paymentType=DB".
-		"&customer.givenName=".$primer_nombre.
-		"&customer.middleName=".$segundo_nombre.
+
 		"&customer.surname=".$apellido.
-		"&customer.ip=".$ip_address.
+		
 		"&customer.merchantCustomerId=000000000001".
-		"&merchantTransactionId=transaction_".$trx.		
-		"&customer.email=".$email.
+				
 		"&customer.identificationDocType=IDCARD".		
-		"&customer.identificationDocId=".$cedula.
-		"&customer.phone=".$telefono.
-		"&billing.street1=".$direccion_cliente.
-		"&billing.country=".$pais_cliente.
-		"&shipping.street1=".$direccion_entrega.
-		"&shipping.country=".$pais_entrega.
-		/*"&recurringType=INITIAL".*/
+		
+		
+		
+		
+		
+		
+		/"&recurringType=INITIAL"./
 		"&risk.parameters[USER_DATA2]=DATAFAST".
 		"&customParameters[SHOPPER_VERSIONDF]=2".
 		"&customParameters[".$merchterm."]=00810030070103910004012".$valueIva."05100817913101052012".$valueTotalBase0."053012".$valueTotalIva;
@@ -121,7 +108,7 @@ function request($items, $total,$iva,$totaTarifa12,$totalBase0,$email, $primer_n
 		'Authorization:Bearer '.$_SESSION['autorizador']));
 	curl_setopt($ch, CURLOPT_POST, 1);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);// this should be set to true in production
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);// this should be set to true in production
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	$responseData = curl_exec($ch);
 	if(curl_errno($ch)) {
@@ -134,11 +121,13 @@ function request($items, $total,$iva,$totaTarifa12,$totalBase0,$email, $primer_n
 $baseUrl = "https://pagostest.datafast.com.ec/df/payment.php";
 
 if(!is_float($totalBaseIva))
+{
 	$totalBaseIva= number_format((float)$totalBaseIva, 2, '.', '');
-
+}
 if(!is_float($totalBase0))
+{
 	$totalBase0 = number_format((float)$totalBase0, 2, '.', '');
-
+}
 $iva =  $totalBaseIva * 0.12;
 $iva =  round($iva,2);
 $iva = number_format((float)$iva, 2, '.', '');
@@ -147,12 +136,12 @@ $total = $totalBaseIva + $iva + $totalBase0; //Monto total de la transaccion
 $total = number_format((float)$total, 2, '.', '');
 
 
-$responseData = request($items_details, $total,$iva,$totalBaseIva,$totalBase0, $email, $primer_nombre, $segundo_nombre, $apellido,$cedula, $trx, $ip_address, $finger,$merchterm, $telefono, $direccion_cliente, $pais_cliente, $direccion_entrega, $pais_entrega);
+$responseData = request($items_details,,$iva,$totalBaseIva,$totalBase0, $finger,$merchterm);
 $json = json_decode($responseData, true);
 
 ?>
 <!DOCTYPE html>
-"<html>" 
+<html lang="es">
 <head>
 	<title></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -163,13 +152,13 @@ $json = json_decode($responseData, true);
 <script type='text/javascript' src="../bootstrap.min.js"></script>
 
 <body class="well">
-<script src="https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=<?php echo $json['id'] ?>"></script>
+<script src="https://cdnexample.com/script.js" integrity="sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxy9rx7HNQlGYl1kPzQho1wx4JwY8wC"></script> <!-- Compliant: integrity value should be replaced with the digest of the expected resource -->
 
 
 <div class="container">
 	<div class="row">
 		<div class="col-md-12">
-			<img src="../imagenes/logo-datafast.png">
+			<img src="../imagenes/logo-datafast.png" alt="foto">
 		</div>
 		<div class="col-md-12">
 		<h1>Portal de compras</h1>
@@ -192,10 +181,11 @@ $json = json_decode($responseData, true);
 		</div>
 		<div class="row">
 		<div class="col-md-12 text-center">
-		<!-- <img src="../imagenes/marcas.png"> -->
+		
 		</div>
 	</div>
-	<p>Powered by <a href="http://www.datafast.com.ec/" target="_blank">Datafast</a></p>	
+	
+	<p>Powered by <a href="http://petssocialnetwork.io" target="_blank" rel="noopener"> <!-- Compliant --></p>	
 	</div>
 </div>
 </body>
